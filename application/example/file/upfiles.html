@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>文件断点续传</title>
+    <script src="../../../dist/dependency/axios.js"></script>
+    <script src="../../../dist/dependency/spark-md5.js"></script>
+    <script src="../../../dist/dependency/qs.js"></script>
+    <script src="../../../dist/dependency/jquery-3.3.1.js"></script>
+    <script src="../../../dist/toolhelp.js"></script>
+  </head>
+  <body style="margin:0">
+    <input id="file" type="file" />
+    <br />
+    进度条：
+    <label id="progress"></label>
+    <br />
+    <a id="upload" href="javascript:uploadControl();">上传</a>
+    <script>
+      let toolhelp = new ToolHelp();
+      let upfile = new toolhelp.files.UpFiles();
+
+      function uploadControl() {
+        var text = $("#upload").text();
+        if (text == "上传") {
+          if (!upfile.continue) {
+            upfile.isUpLoad = true;
+            upload();
+            $("#upload").text("暂停");
+          } else {
+            upfile.isUpLoad = true;
+            ContinueUpLoad();
+            $("#upload").text("暂停");
+          }
+        } else {
+          upfile.isUpLoad = false;
+          upfile.continue = true;
+          $("#upload").text("上传");
+        }
+      }
+      //新的上传或者浏览器关闭之后的重新断点续传
+      function upload() {
+        let files = document.getElementById("file").files[0];
+        console.log(document.getElementById("file").files[0]);
+
+        let WebApi = new ToolHelp().https.WebApi;
+        let _this = this;
+        upfile.file = files;
+        upfile.url = WebApi.fileServePath + "/upfile/isbreakpointbybinary";
+        upfile.urlMerge = WebApi.fileServePath + "/upfile/mergebinary";
+        upfile.urlDetMd5 = WebApi.fileServePath + "/upfile/detectionmd5";
+        upfile.urlDetBin = WebApi.fileServePath + "/upfile/detectionbinary";
+        upfile.param.filepath = "files";
+        //进度条
+        upfile.progressBar = function(e) {
+          $("#progress").text(e);
+        };
+        upfile
+          .ControlFlow()
+          .then(function(response) {
+            if (response.status) {
+              console.log("上传成功");
+              $("#upload").text("上传");
+              upfile.isUpLoad = false;
+            } else {
+              console.log(response.data);
+            }
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+      }
+
+      //手动暂停的续传
+      function ContinueUpLoad() {
+        upfile
+          .ContinueUpLoad()
+          .then(function(response) {
+            if (response.status) {
+              console.log("上传成功");
+              $("#upload").text("上传");
+              upfile.isUpLoad = false;
+            } else {
+              console.log(response.data);
+            }
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+      }
+    </script>
+  </body>
+</html>

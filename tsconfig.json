@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "noResolve": false, //不把 /// <reference``>或模块导入的文件加到编译文件列表。
+    "removeComments": true, //删除注释
+    "sourceMap": false, //是否生成map文件
+    "target": "es2018",
+    "noImplicitThis": true,
+    // 这可以对this上的数据属性进行更严格的推断
+    "strict": true,
+    // 如果使用 webpack 2+ 或 rollup，可以利用 tree-shake:
+    "module": "commonjs", //es2015  AMD commonjs
+    "moduleResolution": "node",
+    "charset": "utf-8", //生成文件的编码
+    "outDir": "./dist/", //重新定向目录
+    "allowJs": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "typeRoots": ["./src/interface/common/"],
+    "types": ["axios","spark-md5","qs"]//必须文件名加index.d.ts
+  },
+  "include": ["src/**/*", "src/**/**/*"],
+  "compileOnSave": true,
+  "exclude": ["node_modules"] //排除目录
+  //"start": "tsc && concurrently \"npm run tsc:w\" \"npm run lite\"",
+}
