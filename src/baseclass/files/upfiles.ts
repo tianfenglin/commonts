@@ -35,7 +35,7 @@ class UpFiles {
   /**记录切片数据集合 */
   public slicesRecord: any[] = [];
   /**切片同时最大上传数量 默认3 */
-  public upnumbermax = 1;
+  public upnumbermax = 3;
   /**记录已经上传或正在上传的索引*/
   public upnumberRecord: any[] = [];
 
@@ -50,14 +50,14 @@ class UpFiles {
     await this.GetFileMd5();
     console.log(this.md5);
     //获取切片封装
-    this.fileSlices();
+    this.FileSlices();
     //校验是否续传以及校验切片完整性
     await this.DetectionMd5();
     //等待分片全部上传完成
-    await this.upBinaryFiles();
+    await this.UpBinaryFiles();
     //等待分片合并完成
     if (this.isUpLoad) {
-      result = await this.mergeBinary();
+      result = await this.MergeBinary();
     } else {
       result.data = "已暂停上传";
       result.status = false;
@@ -70,14 +70,20 @@ class UpFiles {
   public async ContinueUpLoad() {
     let result = new UpFileResult();
     //等待分片全部上传完成
-    await this.upBinaryFiles();
-    result = await this.mergeBinary();
+    await this.UpBinaryFiles();
+    //等待分片合并完成
+    if (this.isUpLoad) {
+      result = await this.MergeBinary();
+    } else {
+      result.data = "已暂停上传";
+      result.status = false;
+    }
     return result;
   }
   /**
    * 文件切片封装
    */
-  public fileSlices(): any[] {
+  public FileSlices(): any[] {
     /**文件大小 */
     let filesize = this.file.size;
     /**切片数量进一取整 */
@@ -259,7 +265,7 @@ class UpFiles {
     return result;
   }
   /**合并分片方法 */
-  public mergeBinary(): Promise<UpFileResult> {
+  public MergeBinary(): Promise<UpFileResult> {
     let upFileResult = new UpFileResult();
     let result = new Promise<UpFileResult>((reslove, reject) => {
       let _this = this;
@@ -290,7 +296,7 @@ class UpFiles {
   }
 
   /**上传切片控制 */
-  public upBinaryFiles() {
+  public UpBinaryFiles() {
     let result = new Promise<void>((reslove, reject) => {
       /**切片此时上传数量 */
       let upnumberrec = 0;
