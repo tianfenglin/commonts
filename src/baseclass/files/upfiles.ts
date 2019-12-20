@@ -64,6 +64,9 @@ class UpFiles {
     }
     return result;
   }
+  /**
+   * 手动暂停的断点续传
+   */
   public async ContinueUpLoad() {
     let result = new UpFileResult();
     //等待分片全部上传完成
